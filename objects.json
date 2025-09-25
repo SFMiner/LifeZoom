@@ -1,0 +1,433 @@
+[
+  {
+	"id": "hydrogen_atom",
+	"display_name": "Hydrogen Atom",
+	"real_size_m": 1e-10,
+	"image_path": "res://assets/hydrogen.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [0, 1400],
+	"notes": "Approximate diameter of a hydrogen atom (~1 \u00c5)."
+  },
+  {
+	"id": "water_molecule",
+	"display_name": "Water Molecule",
+	"real_size_m": 3e-10,
+	"image_path": "res://assets/water.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 500],
+	"notes": "Approximate diameter of a water molecule."
+  },
+  {
+	"id": "dna_helix",
+	"display_name": "DNA Helix\n(width)",
+	"real_size_m": 4e-09,
+	"image_path": "res://assets/dna.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [400, 1100],
+	"notes": "Approximate width of a DNA double helix (2 nm)."
+  },
+  {
+	"id": "coronavirus",
+	"display_name": "Coronavirus",
+	"real_size_m": 1e-07,
+	"image_path": "res://assets/coronavirus.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [800, 800],
+	"notes": "Typical virus size (~100 nm)."
+  },
+  {
+	"id": "bacteriophage",
+	"display_name": "Bacteriophage",
+	"real_size_m": 16e-08,
+	"image_path": "res://assets/bacteriophage.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [-300, 900],
+	"notes": "Typical virus size (~150 nm)."
+  },
+  {
+	"id": "mitochondrion",
+	"display_name": "Mitochondrion",
+	"real_size_m": 0.0000005,
+	"image_path": "res://assets/mitochondrion.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [-150, 750],
+	"notes": "samller than some bacteria size (~50 \u00b2m)."
+  },
+  {
+	"id": "e_coli",
+	"display_name": "E. coli",
+	"real_size_m": 0.000002,
+	"image_path": "res://assets/e_coli.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [800, 800],
+	"notes": "small bacterium size (~200 \u00b2m)."
+  },
+ {
+	"id": "yeast",
+	"display_name": "Yeast\nCell",
+	"real_size_m": 1e-05,
+	"image_path": "res://assets/yeast.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [900, 800],
+	"notes": "Typical virus size (~100 nm)."
+  },
+ {
+	"id": "sperm",
+	"display_name": "Human \nSperm",
+	"real_size_m": 0.00005,
+	"image_path": "res://assets/sperm.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 1100],
+	"notes": "samller than some bacteria size (~50 \u00b2m)."
+  },
+   {
+	"id": "ovum",
+	"display_name": "Human\nOvum\n(egg)",
+	"real_size_m": 1.5e-04,
+	"image_path": "res://assets/ovum.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [-250, 700],
+	"notes": "Large human cell size (~150 \u00b5m)."
+  },
+  {
+	"id": "paramecium",
+	"display_name": "Paramecium",
+	"real_size_m": 2e-04,
+	"image_path": "res://assets/paramecium.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [-50, 1000],
+	"notes": "Average human cell size (~10 \u00b5m)."
+  },
+   {
+	"id": "demodex_mite",
+	"display_name": "Demodex Mite",
+	"real_size_m": 0.00015,
+	"image_path": "res://assets/demodex.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 800],
+	"notes": "Average human cell size (~10 \u00b5m)."
+  },
+   {
+	"id": "red_ant",
+	"display_name": "Red Ant",
+	"real_size_m": 0.0015,
+	"image_path": "res://assets/red_ant.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [400, 400],
+	"notes": "Representative insect (1.5mm cm)."
+  },
+  {
+	"id": "black_ant",
+	"display_name": "Black Ant",
+	"real_size_m": 0.005,
+	"image_path": "res://assets/black_ant.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [700, 700],
+	"notes": "Representative insect (5mm)."
+  },
+  {
+	"id": "rice",
+	"display_name": "Grain\nof Rice",
+	"real_size_m": 0.007,
+	"image_path": "res://assets/rice.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [100, 950],
+	"notes": "Representative grain (7mm)."
+  },
+  {
+	"id": "coffee_bean",
+	"display_name": "Coffee\nBean",
+	"real_size_m": 0.010,
+	"image_path": "res://assets/coffee_bean.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 750],
+	"notes": "medium sized insect (12mm cm)."
+  },
+ {
+	"id": "honey_bee",
+	"display_name": "Honeybee",
+	"real_size_m": 0.012,
+	"image_path": "res://assets/honeybee.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 650],
+	"notes": "medium sized insect (12mm cm)."
+  },
+ {
+	"id": "hummingbird_eggs",
+	"display_name": "Hummingbird\nEgg",
+	"real_size_m": 0.016,
+	"image_path": "res://assets/hummingbird_eggs.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [500, 1000],
+	"notes": "Smallest bird eggs."
+  },
+  {
+	"id": "etruscan_shrew",
+	"display_name": "Etruscan\nShrew",
+	"real_size_m": 0.05,
+	"image_path": "res://assets/etruscan_shrew.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [900, 950],
+	"notes": "Smallest known mammal."
+  },
+  {
+	"id": "hen_egg",
+	"display_name": "Chicken\nEgg",
+	"real_size_m": 0.062,
+	"image_path": "res://assets/hen_egg.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [-200, 750],
+	"notes": "Medium-sized bird egg."
+},
+  {
+	"id": "ostritch_egg",
+	"display_name": "Ostritch\nEgg",
+	"real_size_m": 0.15,
+	"image_path": "res://assets/ostritch_egg.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [-50, 700],
+	"notes": "Largest bird egg."
+  },
+  {
+	"id": "chihuahua",
+	"display_name": "Chihuahua",
+	"real_size_m": 0.35,
+	"image_path": "res://assets/chihuahua.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [400, 600],
+	"notes": "Small dog."
+  },
+  {
+	"id": "cat",
+	"display_name": "cat",
+	"real_size_m": 0.5,
+	"image_path": "res://assets/cat.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [850, 950],
+	"notes": "Small mammal."
+  },
+{
+	"id": "human",
+	"display_name": "Human",
+	"real_size_m": 1.7,
+	"image_path": "res://assets/human.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [-50, 900],
+	"notes": "Average adult human height."
+  },
+{
+	"id": "great_dane",
+	"display_name": "Great\nDane",
+	"real_size_m": 1.7,
+	"image_path": "res://assets/great_dane.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [-100, 700],
+	"notes": "A large dog."
+  },
+{
+	"id": "great_white",
+	"display_name": "Great White Shark",
+	"real_size_m": 4.9,
+	"image_path": "res://assets/great_white.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 700],
+	"notes": "A large shark."
+  },
+{
+	"id": "elephant",
+	"display_name": "African\nElephant",
+	"real_size_m": 5.2,
+	"image_path": "res://assets/african_elephant.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [800, 800],
+	"notes": "The largest living land mammal."
+  },
+{
+	"id": "saltwater_crocodile",
+	"display_name": "Saltwater\nCrocodile",
+	"real_size_m": 6,
+	"image_path": "res://assets/saltwater_crocodile.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 1050],
+	"notes": "The largest living reptile."
+  },
+  {
+	"id": "t_rex",
+	"display_name": "T. rex",
+	"real_size_m": 12,
+	"image_path": "res://assets/t_rex.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [400, 1100],
+	"notes": "A large therapod dinosaur."
+  },
+  {
+	"id": "megalodon",
+	"display_name": "Megalodon",
+	"real_size_m": 21,
+	"image_path": "res://assets/megalodon.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 1100],
+	"notes": "The largest known extinct shark."
+  },
+{
+	"id": "blue_whale",
+	"display_name": "Blue Whale",
+	"real_size_m": 31,
+	"image_path": "res://assets/blue_whale.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [400, 1050],
+	"notes": "The largest animal knwon to have lived."
+  },{
+	"id": "city_block",
+	"display_name": "City Block",
+	"real_size_m": 100.0,
+	"image_path": "res://assets/city_block.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [1500, 200],
+	"notes": "Approximate length of a city block (100 m)."
+  },
+  {
+	"id": "mountain",
+	"display_name": "Mountain",
+	"real_size_m": 1000.0,
+	"image_path": "res://assets/mountain.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 1400],
+	"notes": "Representative mountain (~1 km)."
+  },
+  {
+	"id": "humongous_fungus",
+	"display_name": "Humongous\nFungus",
+	"real_size_m": 4000.0,
+	"image_path": "res://assets/humongous_fungus.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [200, 1400],
+	"notes": "3.5 square miles; about 2.5 miles across."
+  },
+  {
+	"id": "north_america",
+	"display_name": "North America",
+	"real_size_m": 1000000.0,
+	"image_path": "res://assets/north_america.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"position_shift": [1200, 2800],
+	"notes": "Representative continent (~1000 km)."
+  },
+  {
+	"id": "earth",
+	"display_name": "Earth",
+	"real_size_m": 12742000.0,
+	"image_path": "res://assets/earth.png",
+	"pivot_normalized": [
+	  0.5,
+	  0.5
+	],
+	"notes": "Diameter of Earth (~12,742 km).",
+	"position_shift": [-200, 1400]
+  }
+]

@@ -1,0 +1,286 @@
+extends Node2D
+
+# ObjectManager loads universal objects from a JSON definition and
+# manages their lifecycle: instantiation, visibility, scaling and
+# fading based on the current log‑scale zoom.  It connects to
+# ZoomManager's `zoom_changed` signal and updates the objects when
+# the zoom changes.  It also exposes a simple debug label showing
+# the current scale and nearest landmark.
+
+class_name ObjectManager
+
+## Pixel threshold below which objects are hidden entirely.
+const MIN_PX: float = 2.0
+## Pixel threshold over which objects begin to fade in fully.
+const FADE_IN_PX: float = 6.0
+## Maximum multiple of the nominal target size before objects are hidden.
+const MAX_DISPLAY_MULTIPLIER: float = 10.0
+## Portion of the viewport width used as the nominal object width when fully visible.
+const NOMINAL_RATIO: float = 0.8
+
+## A list of dictionaries loaded from the JSON file.  Each entry
+## contains keys matching those defined in objects.json (id,
+## display_name, real_size_m, image_path, pivot_normalized, notes).
+var objects: Array = []
+
+## The Sprite2D nodes created to represent each object.  Indices
+## correspond to `objects`.
+var sprites: Array = []
+
+## Precomputed nominal log zoom for each object.  At this zoom the
+## object's size on screen is roughly `NOMINAL_RATIO * viewport_width_px`.
+var nominal_log_zoom: Array = []
+
+## Precomputed log zoom values at which each object becomes too small
+## to see (below MIN_PX).
+var min_log_zoom_values: Array = []
+
+## Precomputed log zoom values at which each object becomes too large
+## (above MAX_DISPLAY_MULTIPLIER times the nominal size).
+var max_log_zoom_values: Array = []
+
+## Index of the object whose nominal zoom is closest to the current
+## zoom.  Used for debug display.
+var nearest_obj_idx: int = -1
+
+## Reference to the ZoomManager node.  Cached at runtime.
+var zoom_manager: ZoomManager = null
+
+## Label used to show debug information.  It is assigned in the
+## scene's Main.tscn and updated by this manager.
+var debug_label: Label = null
+
+func _ready() -> void:
+	# Locate the ZoomManager instance.  It should be a sibling in the
+	# scene tree named "ZoomManager".  If not found, searches the
+	# entire tree as a fallback.  Do not throw if missing – instead
+	# degrade gracefully.
+	zoom_manager = get_parent().get_node_or_null("ZoomManager")
+	if zoom_manager == null:
+		zoom_manager = get_tree().get_root().find_node("ZoomManager", true, false)
+
+	# Load object definitions and spawn sprites.
+	_load_objects()
+
+	# Compute per‑object thresholds and global zoom bounds based on the
+	# current viewport.  These will be recomputed if the viewport
+	# changes size.
+	_compute_thresholds()
+
+	# Connect to zoom updates from the ZoomManager.
+	if zoom_manager != null:
+		zoom_manager.connect("zoom_changed", Callable(self, "_on_zoom_changed"))
+
+	# Connect to viewport resizing; when the window changes size we
+	# recompute thresholds for proper scaling.  Node2D doesn't emit
+	# `resized`, so we listen to the viewport directly.
+	var viewport := get_viewport()
+	if viewport:
+		viewport.connect("size_changed", Callable(self, "_on_viewport_size_changed"))
+
+	# Initialise visible state using the current zoom.
+	if zoom_manager:
+		_on_zoom_changed(zoom_manager.log_zoom_current)
+
+	# Attempt to locate a debug label within the scene to write
+	# diagnostic information.  The label is optional; if it cannot
+	# be found then the manager simply won't display debug text.
+	var lbl : Label = $"../CanvasLayer/DebugLabel"
+	if lbl and lbl is Label:
+		debug_label = lbl
+
+func _load_objects() -> void:
+	# Reads objects from the JSON file located alongside this script.
+	var path = "res://objects.json"
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		push_warning("Unable to open objects definition: {0}".format([path]))
+		return
+	var json_text := file.get_as_text()
+	file.close()
+	var data = JSON.parse_string(json_text)
+	if typeof(data) != TYPE_ARRAY:
+		push_warning("Invalid objects.json format: expected an array.")
+		return
+	objects = data
+	#print(objects)
+	# Create a Sprite2D for each entry.
+	for obj_dict in objects:
+		#print("\n" + str(obj_dict))
+		var tex := load(obj_dict["image_path"])
+		if tex == null:
+			push_warning("Failed to load texture for %s" % obj_dict["id"])
+			continue
+		var sprite : Sprite2D = Sprite2D.new()
+		sprite.texture = tex
+		# Centre the sprite so that (0,0) is its pivot.  We'll apply
+		# additional offset based on pivot_normalized below.
+		sprite.centered = true
+		sprite.position = Vector2.ZERO
+		sprite.visible = false
+		# Apply pivot_normalized: if the pivot is not at the centre
+		# (0.5,0.5) we shift the sprite's offset so that scaling and
+		# rotation behave correctly.  When centered=true, the origin is
+		# the centre of the texture.  We convert the normalised pivot
+		# into pixel space and subtract the difference.
+		if obj_dict.has("pivot_normalized"):
+			#print("\n" + str(sprite))
+			var pivot_n: Vector2 = Vector2(obj_dict["pivot_normalized"][0], obj_dict["pivot_normalized"][1])
+			var tex_size := Vector2(tex.get_width(), tex.get_height())
+			# pivot_n is in [0,1]; the default pivot when centered is (0.5,0.5).
+			var delta: Vector2 = (pivot_n - Vector2(0.5, 0.5)) * tex_size
+			sprite.offset = -delta
+		add_child(sprite)
+		sprites.append(sprite)
+	# Initialise arrays for thresholds to the same size as objects.
+	nominal_log_zoom.resize(objects.size())
+	min_log_zoom_values.resize(objects.size())
+	max_log_zoom_values.resize(objects.size())
+
+func _compute_thresholds() -> void:
+	# Determine the viewport width to compute target pixel sizes.  Use
+	# get_visible_rect() to avoid including any camera zoom factor.
+	var vp_size: Vector2 = get_viewport().get_visible_rect().size
+	var width_px := vp_size.x
+	# The nominal pixel width for an object to occupy when fully visible.
+	var target_px := width_px * NOMINAL_RATIO
+	# Precompute thresholds for each object.
+	for i in objects.size():
+		var obj = objects[i]
+		var real_size = obj["real_size_m"]
+		# log(metres per pixel) at which the object is nominal size.
+		nominal_log_zoom[i] = log(real_size / target_px)
+		# At log_zoom values larger than this, the object becomes too small (< MIN_PX).
+		min_log_zoom_values[i] = log(real_size / MIN_PX)
+		# At log_zoom values smaller than this, the object becomes too large (> max display).
+		max_log_zoom_values[i] = log(real_size / (target_px * MAX_DISPLAY_MULTIPLIER))
+	# Update global bounds on the zoom manager.  Each object defines
+	# a range [max_log_zoom_values[i], min_log_zoom_values[i]] in
+	# which it is visible.  The overall allowed zoom range must
+	# encompass all such ranges, so we take the minimum of the lower
+	# bounds and the maximum of the upper bounds.
+	if zoom_manager != null and objects.size() > 0:
+		var global_min = max_log_zoom_values[0]
+		var global_max = min_log_zoom_values[0]
+		# global_min is the smallest of the max_log_zoom values (most
+		# negative zoom when zooming in).  global_max is the largest of
+		# the min_log_zoom values (most positive zoom when zooming out).
+		for v in max_log_zoom_values:
+			if v < global_min:
+				global_min = v
+		for v in min_log_zoom_values:
+			if v > global_max:
+				zoom_manager.set_zoom_bounds(global_min, global_max)
+		# Choose an initial zoom roughly in the middle of the allowed
+		# range.  This centres the view on an intermediate scale so
+		# that the user sees a recognisable object on startup.  A
+		# simple average suffices for demonstration purposes.
+		var initial_zoom: float = (global_min + global_max) * 0.5
+		zoom_manager.set_initial_zoom(initial_zoom)
+		
+		# After computing thresholds, update the positions of all sprites
+	# so that they do not overlap.  We stagger them around a circle
+	# with increasing radius.
+	_update_positions()
+
+func _on_viewport_size_changed() -> void:
+	# Recompute thresholds when the viewport is resized.  This ensures
+	# objects scale appropriately if the window size changes.
+	_compute_thresholds()
+	# Force update with the current zoom to apply new thresholds.
+	if zoom_manager != null:
+		_on_zoom_changed(zoom_manager.log_zoom_current)
+
+func _update_positions() -> void:
+	# Stagger object positions in a clockwise pattern to avoid overlap.
+	# Objects are arranged around a circle with a base radius that
+	# depends on the viewport width.  Successive objects are placed
+	# farther out along the same direction to form a loose spiral.
+	if objects.size() == 0:
+		return
+	var vp_size: Vector2 = get_viewport().get_visible_rect().size
+	var width_px: float = vp_size.x
+	# Base radius is a fraction of the viewport width.  Adjust this
+	# constant to control how far away objects are spaced.  0.25
+	# positions the first object a quarter of the screen width away
+	# from the centre.  Larger values separate objects further.
+	var base_radius: float = width_px * 0.25
+	var n: int = objects.size()
+	for i in range(n):
+		var angle: float = TAU * i / float(n)  # TAU = 2π
+		# Increase radius slightly with each subsequent object to form
+		# a spiral.  The 0.2 factor controls radial growth; adjust as
+		# needed.  For example, i = 0 -> 1.0×radius, i = 1 -> 1.2×radius, etc.
+		var radius: float = base_radius * (0.5 + 0.2 * i)
+		var dir: Vector2 = Vector2(cos(angle), sin(angle))
+		sprites[i].position = dir * radius
+
+func _on_zoom_changed(log_zoom: float) -> void:
+	# Determine the target and fade out thresholds based on current
+	# viewport width.  They are recomputed here in case the viewport
+	# changed since the last computation.
+	var vp_size: Vector2 = get_viewport().get_visible_rect().size
+	var width_px := vp_size.x
+	var target_px := width_px * NOMINAL_RATIO
+	var fade_out_threshold := target_px * MAX_DISPLAY_MULTIPLIER
+
+	# Track which object is closest to its nominal zoom.  Used for
+	# debug UI.
+	nearest_obj_idx = -1
+	var nearest_delta: float = 1e30
+
+	for i in objects.size():
+		var obj = objects[i]
+		var sprite: Sprite2D = sprites[i]
+		var real_size: float = obj["real_size_m"]
+		# Compute how many pixels this object should occupy at the
+		# current log zoom.  screen_px = real_size / metres_per_pixel
+		var metres_per_pixel := exp(log_zoom)
+		var screen_px: float = real_size / metres_per_pixel
+		# Visibility and culling based on pixel size.
+		if screen_px < MIN_PX or screen_px > fade_out_threshold:
+			sprite.visible = false
+			continue
+		sprite.visible = true
+		# Determine scale factor so that the texture width matches
+		# screen_px.  Use the texture's width for both axes to
+		# preserve aspect ratio.
+		var tex: Texture2D = sprite.texture
+		var img_w: float = float(tex.get_width())
+		# Avoid division by zero in case of missing texture.
+		var scale_factor: float = 1.0
+		if img_w > 0.0:
+			scale_factor = screen_px / img_w
+		sprite.scale = Vector2(scale_factor, scale_factor)
+		# Fade in/out near thresholds.  Fade in when the object is
+		# small (between MIN_PX and FADE_IN_PX).  Fade out when the
+		# object is large (between 90% of fade_out_threshold and
+		# 100%).
+		var alpha: float = 1.0
+		# Fade in from invisible at MIN_PX to opaque at FADE_IN_PX.
+		if screen_px <= FADE_IN_PX:
+			alpha = clamp((screen_px - MIN_PX) / (FADE_IN_PX - MIN_PX), 0.0, 1.0)
+		# Fade out when near the maximum size.  Start fading when
+		# reaching 90% of the maximum allowed size.
+		var fade_start := fade_out_threshold * 0.9
+		if screen_px >= fade_start:
+			var fade_range := fade_out_threshold - fade_start
+			alpha = min(alpha, clamp((fade_out_threshold - screen_px) / fade_range, 0.0, 1.0))
+		# Apply the alpha via modulation.  Keep RGB intact.
+		var modulate_colour := sprite.modulate
+		modulate_colour.a = alpha
+		sprite.modulate = modulate_colour
+		# Track nearest object by comparing the difference between
+		# current log zoom and its nominal zoom.  The object with
+		# minimal absolute difference is considered closest.
+		var delta_z  : float = abs(log_zoom - nominal_log_zoom[i])
+		if delta_z < nearest_delta:
+			nearest_delta = delta_z
+			nearest_obj_idx = i
+	# Update debug UI if present.
+	if debug_label != null:
+		var nearest_name := "None"
+		if nearest_obj_idx >= 0 and nearest_obj_idx < objects.size():
+			nearest_name = objects[nearest_obj_idx]["display_name"]
+		var metres_per_pixel := exp(log_zoom)
+		debug_label.text = "Metres per pixel: {0:.3e}\nNearest object: {1}\nlog_zoom: {2:.2f}".format([metres_per_pixel, nearest_name, log_zoom])
