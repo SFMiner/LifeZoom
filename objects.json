@@ -8,7 +8,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [0, 1400],
+	"position_shift": [200, 1400],
 	"notes": "Approximate diameter of a hydrogen atom (~1 \u00c5)."
   },
   {
@@ -20,7 +20,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [200, 500],
+	"position_shift": [400, 600],
 	"notes": "Approximate diameter of a water molecule."
   },
   {
@@ -56,7 +56,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [-300, 900],
+	"position_shift": [225, 900],
 	"notes": "Typical virus size (~150 nm)."
   },
   {
@@ -68,7 +68,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [-150, 750],
+	"position_shift": [-100, 750],
 	"notes": "samller than some bacteria size (~50 \u00b2m)."
   },
   {
@@ -128,19 +128,19 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [-50, 1000],
+	"position_shift": [-100, 1000],
 	"notes": "Average human cell size (~10 \u00b5m)."
   },
    {
 	"id": "demodex_mite",
-	"display_name": "Demodex Mite",
+	"display_name": "Demodex\nMite",
 	"real_size_m": 0.00015,
 	"image_path": "res://assets/demodex.png",
 	"pivot_normalized": [
 	  0.5,
 	  0.5
 	],
-	"position_shift": [200, 800],
+	"position_shift": [500, 750],
 	"notes": "Average human cell size (~10 \u00b5m)."
   },
    {
@@ -164,7 +164,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [700, 700],
+	"position_shift": [300, 1400],
 	"notes": "Representative insect (5mm)."
   },
   {
@@ -200,7 +200,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [200, 650],
+	"position_shift": [300, 650],
 	"notes": "medium sized insect (12mm cm)."
   },
  {
@@ -212,7 +212,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [500, 1000],
+	"position_shift": [550, 1100],
 	"notes": "Smallest bird eggs."
   },
   {
@@ -248,7 +248,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [-50, 700],
+	"position_shift": [150, 700],
 	"notes": "Largest bird egg."
   },
   {
@@ -260,7 +260,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [400, 600],
+	"position_shift": [600, 700],
 	"notes": "Small dog."
   },
   {
@@ -272,7 +272,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [850, 950],
+	"position_shift": [900, 1000],
 	"notes": "Small mammal."
   },
 {
@@ -284,7 +284,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [-50, 900],
+	"position_shift": [50, 800],
 	"notes": "Average adult human height."
   },
 {
@@ -296,7 +296,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [-100, 700],
+	"position_shift": [200, 500],
 	"notes": "A large dog."
   },
 {
@@ -308,7 +308,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [200, 700],
+	"position_shift": [250, 700],
 	"notes": "A large shark."
   },
 {
@@ -320,19 +320,19 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [800, 800],
+	"position_shift": [750, 1050],
 	"notes": "The largest living land mammal."
   },
 {
 	"id": "saltwater_crocodile",
 	"display_name": "Saltwater\nCrocodile",
-	"real_size_m": 6,
+	"real_size_m": 7,
 	"image_path": "res://assets/saltwater_crocodile.png",
 	"pivot_normalized": [
 	  0.5,
 	  0.5
 	],
-	"position_shift": [200, 1050],
+	"position_shift": [100, 1100],
 	"notes": "The largest living reptile."
   },
   {
@@ -344,7 +344,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [400, 1100],
+	"position_shift": [250, 1050],
 	"notes": "A large therapod dinosaur."
   },
   {
@@ -356,7 +356,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [200, 1100],
+	"position_shift": [500, 1200],
 	"notes": "The largest known extinct shark."
   },
 {
@@ -368,18 +368,18 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [400, 1050],
+	"position_shift": [400, 1100],
 	"notes": "The largest animal knwon to have lived."
   },{
 	"id": "city_block",
-	"display_name": "City Block",
+	"display_name": "City\nBlock",
 	"real_size_m": 100.0,
 	"image_path": "res://assets/city_block.png",
 	"pivot_normalized": [
 	  0.5,
 	  0.5
 	],
-	"position_shift": [1500, 200],
+	"position_shift": [850, 900],
 	"notes": "Approximate length of a city block (100 m)."
   },
   {
@@ -391,7 +391,7 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [200, 1400],
+	"position_shift": [475, 1200],
 	"notes": "Representative mountain (~1 km)."
   },
   {
@@ -403,31 +403,31 @@
 	  0.5,
 	  0.5
 	],
-	"position_shift": [200, 1400],
+	"position_shift": [100, 900],
 	"notes": "3.5 square miles; about 2.5 miles across."
   },
   {
 	"id": "north_america",
-	"display_name": "North America",
+	"display_name": "North\nAmerica",
 	"real_size_m": 1000000.0,
 	"image_path": "res://assets/north_america.png",
 	"pivot_normalized": [
 	  0.5,
 	  0.5
 	],
-	"position_shift": [1200, 2800],
+	"position_shift": [250, 1000],
 	"notes": "Representative continent (~1000 km)."
   },
   {
 	"id": "earth",
 	"display_name": "Earth",
-	"real_size_m": 12742000.0,
+	"real_size_m": 2074200.0,
 	"image_path": "res://assets/earth.png",
 	"pivot_normalized": [
-	  0.5,
-	  0.5
+	  0.3,
+	  0.3
 	],
 	"notes": "Diameter of Earth (~12,742 km).",
-	"position_shift": [-200, 1400]
+	"position_shift": [775, 400]
   }
 ]

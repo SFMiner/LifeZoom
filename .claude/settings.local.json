@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(\"/c/Users/seanm/Nextcloud2/Gamedev/Godot_v4.5-stable_win64.exe\" --version)"
+    ]
+  }
+}

@@ -21,6 +21,12 @@ const NOMINAL_RATIO: float = 0.8
 const CLOSE_RATIO_THRESHOLD: float = 3.0
 const EXTRA_ANGLE: float = 0.5
 
+## Reference texture width used to normalise label sizes.  A texture of
+## exactly this width renders its label at the raw font size; narrower and
+## wider textures are compensated so that every label ends up the same size
+## on screen.  See _load_objects().
+const LABEL_REF_WIDTH: float = 1000.0
+
 const INITIAL_ZOOM : float = -29.0
 ## A list of dictionaries loaded from the JSON file.  Each entry
 ## contains keys matching those defined in objects.json (id,
@@ -50,6 +56,16 @@ var nearest_obj_idx: int = -1
 
 var labels: Array = []
 
+## Ring angle (radians) for each object, indexed alongside `objects`.
+## Derived purely from the real-world size ratios between neighbouring
+## objects, so it does NOT depend on zoom or viewport and is computed
+## exactly once.  Recomputing this per frame from pixel radii caused
+## sprites to teleport: ratios that sit on CLOSE_RATIO_THRESHOLD land on
+## different sides of the comparison as floating-point rounding shifts
+## with the zoom level, and because the angle is a running sum a single
+## flip rotated every later object by EXTRA_ANGLE.
+var ring_angles: Array = []
+
 ## Reference to the ZoomManager node.  Cached at runtime.
 var zoom_manager: ZoomManager = null
 
@@ -68,6 +84,9 @@ func _ready() -> void:
 
 	# Load object definitions and spawn sprites.
 	_load_objects()
+
+	# Fix the ring layout once.  Angles are zoom- and viewport-independent.
+	_compute_ring_angles()
 
 	# Compute per‑object thresholds and global zoom bounds based on the
 	# current viewport.  These will be recomputed if the viewport
@@ -143,6 +162,18 @@ func _load_objects() -> void:
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		
 		
+		# Labels are children of the sprite and inherit its scale, which is
+		# normalised by texture width (scale_factor = screen_px / img_w).
+		# That made rendered font size inversely proportional to the source
+		# image's pixel width — a 1430px texture drew its label at a third
+		# the size of a 500px one.  Pre-multiplying by img_w / LABEL_REF_WIDTH
+		# cancels the img_w term, leaving effective size proportional to
+		# screen_px alone, so labels still grow and shrink with their object.
+		# Zoom-independent, so it is set once here rather than per frame.
+		var lbl_img_w: float = float(tex.get_width())
+		if lbl_img_w > 0.0:
+			lbl.scale = Vector2.ONE * (lbl_img_w / LABEL_REF_WIDTH)
+
 		sprite.add_child(lbl)
 		var shift_x : float
 		var shift_y : float
@@ -159,6 +190,31 @@ func _load_objects() -> void:
 	# Initialise arrays for thresholds to the same size as objects.
 	
 
+
+func _compute_ring_angles() -> void:
+	# Lay the objects out on a ring around object 0.  Each object advances
+	# one radian from the previous, plus EXTRA_ANGLE when neighbouring
+	# objects are close in size and would otherwise crowd each other.
+	# The ratio is taken from real_size_m directly rather than from pixel
+	# radii: the two are mathematically identical (the metres-per-pixel
+	# factor cancels) but the real-size form is evaluated once and is
+	# therefore stable, whereas the pixel form re-rounded every frame.
+	ring_angles.resize(objects.size())
+	if objects.size() == 0:
+		return
+	ring_angles[0] = 0.0
+	var cumulative_angle: float = -PI / 2.0
+	for idx in range(1, objects.size()):
+		var prev_size: float = objects[idx - 1]["real_size_m"]
+		var size_i: float = objects[idx]["real_size_m"]
+		var ratio: float = prev_size / size_i
+		if ratio < 1.0:
+			ratio = 1.0 / ratio
+		var angle_step: float = 1.0
+		if ratio < CLOSE_RATIO_THRESHOLD:
+			angle_step += EXTRA_ANGLE
+		cumulative_angle += angle_step
+		ring_angles[idx] = cumulative_angle
 
 func _compute_thresholds() -> void:
 	# Determine the viewport width to compute target pixel sizes.  Use
@@ -320,33 +376,16 @@ func _on_zoom_changed(log_zoom: float) -> void:
 	# first object's radius.  A margin factor is used to prevent
 	# overlapping.
 	var MARGIN_FACTOR: float = 1.1
-	# Start from directly above the centre.  In Godot's coordinate
-	# system, angles increase clockwise (positive angles rotate downwards),
-	# so an angle of -PI/2 corresponds to up.  Subsequent objects
-	# advance by +1 radian clockwise.
-	var base_angle: float = -PI / 2.0
 	if objects.size() > 0:
 		# centre the first object
 		sprites[0].position = Vector2.ZERO
-		var radius0_px: float = radius_px_arr.size() > 0 if radius_px_arr[0] else 0.0
-		var prev_radius_px: float = radius0_px
-		var cumulative_angle: float = base_angle
+		var radius0_px: float = radius_px_arr[0]
 		for idx in range(1, objects.size()):
 			var radius_i_px: float = radius_px_arr[idx]
-			# Compute the ratio between this object and the previous one
-			var ratio = prev_radius_px / radius_i_px
-			if ratio < 1.0:
-				ratio = 1.0 / ratio
-			# Start with a 1‑radian step; add EXTRA_ANGLE if sizes are close
-			var angle_step: float = 1.0
-			if ratio < CLOSE_RATIO_THRESHOLD:
-				angle_step += EXTRA_ANGLE
-			cumulative_angle += angle_step
-			# Distance remains based on the sum of the first object's radius and this object's radius
+			# Distance is based on the sum of the first object's radius and this object's radius.
 			var distance_px: float = MARGIN_FACTOR * (radius0_px + radius_i_px)
-			var dir_vec: Vector2 = Vector2(cos(cumulative_angle), sin(cumulative_angle))
+			var dir_vec: Vector2 = Vector2(cos(ring_angles[idx]), sin(ring_angles[idx]))
 			sprites[idx].position = dir_vec * distance_px
-			prev_radius_px = radius_i_px
 
 
 	# Update debug UI if present.
